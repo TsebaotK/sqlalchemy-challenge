@@ -11,7 +11,7 @@ from flask import Flask, jsonify
 #################################################
 # Database Setup
 #################################################
-engine = create_engine("sqlite:///Resources/hawaii.sqlite")
+engine = create_engine("sqlite:///Resource/hawaii.sqlite")
 
 # reflect an existing database into a new model
 Base = automap_base()
@@ -29,7 +29,7 @@ session = Session(engine)
 # Flask Setup
 #################################################
 ## WORK NEEDED HERE ##
-
+app = Flask(__name__)
 
 #################################################
 # Flask Routes
@@ -38,6 +38,14 @@ session = Session(engine)
 @app.route("/")
 def welcome():
 ## WORK NEEDED HERE ##
+   return (
+        f"Available Routes:<br/>"
+        f"/api/v1.0/precipitation<br/>"
+        f"/api/v1.0/stations<br/>"
+        f"/api/v1.0/tobs<br/>"
+        f"/api/v1.0/temp/<start><br/>"
+        f"/api/v1.0/temp/<start>/<end>"
+    ) 
 
 
 @app.route("/api/v1.0/precipitation")
@@ -53,7 +61,8 @@ def precipitation():
     session.close()
     # Dict with date as the key and prcp as the value
     ## WORK NEEDED HERE ##
-    return ## WORK NEEDED HERE ##
+    prcp_dictionary = dict(precipitation)
+    return jsonify(prcp_dictionary) ## WORK NEEDED HERE ##
 
 
 @app.route("/api/v1.0/stations")
@@ -65,7 +74,7 @@ def stations():
 
     # Unravel results into a 1D array and convert to a list
     stations = list(np.ravel(results))
-    return ## WORK NEEDED HERE ##
+    return jsonify(stations) ## WORK NEEDED HERE ##
 
 
 @app.route("/api/v1.0/tobs")
@@ -104,17 +113,18 @@ def stats(start=None, end=None):
         # temps = list(np.ravel(results))
         # return jsonify(temps)
 
-        start = dt.datetime.strptime(start, "%m%d%Y")
+        start = dt.datetime.strptime(start, "%Y-%m-%d")
         results = session.query(*sel).\
             filter(Measurement.date >= start).all()
 
         session.close()
 
         temps = list(np.ravel(results))
-        return ## WORK NEEDED HERE ##
+        return jsonify(start_temps=temps) ## WORK NEEDED HERE ##
 
     # calculate TMIN, TAVG, TMAX with start and stop
     ## WORK NEEDED HERE ##
+    end = dt.datetime.strptime(end, "%Y-%m-%d")
 
     results = session.query(*sel).\
         filter(Measurement.date >= start).\
@@ -124,8 +134,9 @@ def stats(start=None, end=None):
 
     # Unravel results into a 1D array and convert to a list
     temps = list(np.ravel(results))
-    return ## WORK NEEDED HERE ##
+    return jsonify(start_to_end_datetemp=temps)## WORK NEEDED HERE ##
 
 
 if __name__ == '__main__':
     ## WORK NEEDED HERE ##
+     app.run(debug=True)
